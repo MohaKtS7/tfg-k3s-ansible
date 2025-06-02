@@ -1,0 +1,9 @@
+- name: Etiquetar y taintar el nodo backup
+  hosts: master
+  become: true
+  tasks:
+    - name: Etiquetar nodo backup con role=standby
+      shell: kubectl label node backup role=standby --overwrite
+
+    - name: Añadir taint para evitar scheduling en el nodo backup
+      shell: kubectl taint node backup role=standby:NoSchedule --overwrite

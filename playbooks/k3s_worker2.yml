@@ -1,0 +1,12 @@
+- name: Desplegar nginx como Deployment con toleration
+  hosts: master
+  become: true
+
+  tasks:
+    - name: Copiar manifiesto de nginx al nodo master
+      template:
+        src: ../templates/nginx.yaml.j2
+        dest: /tmp/nginx-deploy.yaml
+
+    - name: Aplicar Deployment en el clúster
+      shell: kubectl apply -f /tmp/nginx-deploy.yaml

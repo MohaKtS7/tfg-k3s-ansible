@@ -1,0 +1,32 @@
+- name: Desplegar pod nginx en el clúster K3s
+  hosts: master
+  become: true
+
+  tasks:
+    - name: Crear manifiesto nginx
+      copy:
+        dest: /tmp/nginx.yaml
+        content: |
+          apiVersion: v1
+          kind: Pod
+          metadata:
+            name: nginx
+            labels:
+              app: nginx
+          spec:
+            containers:
+              - name: nginx
+                image: nginx
+                ports:
+                  - containerPort: 80
+
+    - name: Aplicar manifiesto nginx
+      shell: kubectl apply -f /tmp/nginx.yaml
+
+    - name: Esperar a que el pod esté en estado Running
+      shell: |
+        kubectl get pod nginx -o jsonpath="{.status.phase}"
+      register: pod_status
+      retries: 5
+      delay: 5
+      until: pod_status.stdout == "Running"
